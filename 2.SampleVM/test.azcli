@@ -1,0 +1,15 @@
+
+# Set your resource group variable
+rgName=laby
+
+# Get the name of all storage accounts in a resource group.
+/snap/bin/azure-cli-johanburati resource list --resource-group $rgName --query "[].{Name:name}" --output table
+
+# Delete storage accounts without a confirmation prompt.
+for saList in $(az storage account list --resource-group $rgName --query "[?starts_with(name, 'msdocs') == \`true\`].id" --output tsv); do
+    echo "deleting storage account $saList"
+    /snap/bin/azure-cli-johanburati storage account delete --ids $saList --yes
+done
+
+# Verify the storage accounts are gone.
+/snap/bin/azure-cli-johanburati storage account list --resource-group $rgName --query "[?starts_with(name, 'msdocs') == \`true\`].name"
